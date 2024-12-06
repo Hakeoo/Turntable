@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>幸运转盘</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            box-sizing: border-box;
+        }
+        
+        .wheel-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+            position: relative;
+        }
+        
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .center-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2196F3 0%, #1e88e5 100%);
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .controls {
+            width: 100%;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+        
+        .spin-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .control-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f6f9fc;
+            padding: 8px;
+            border-radius: 8px;
+        }
+        
+        .control-item label {
+            font-size: 13px;
+            color: #555;
+            white-space: nowrap;
+        }
+        
+        .control-item input {
+            width: 40px;
+            padding: 4px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            margin: 0;
+        }
+        
+        .items-panel {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        
+        .items-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .items-header input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .items-header button {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .items-list {
+            display: grid;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .item input {
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .item input[type="number"] {
+            width: 50px;
+            text-align: center;
+        }
+        
+        .item button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .emoji {
+            position: fixed;
+            pointer-events: none;
+            animation: floatUp 1.2s ease-out forwards;
+            font-size: 24px;
+            z-index: 1000;
+        }
+        
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        .items-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .items-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+        
+        .items-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 2px;
+        }
+        
+        .items-list::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <audio id="clickSound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" type="audio/mpeg">
+    </audio>
+    
+    <div class="container">
+        <div class="wheel-container">
+            <div class="canvas-container">
+                <canvas id="wheel" width="300" height="300"></canvas>
+                <button class="center-button" onclick="spin()">🎲 转动</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="spin-controls">
+                <div class="control-item">
+                    <label>圈数</label>
+                    <input type="number" id="spinRounds" value="4" min="1" max="10" step="1">
+                </div>
+                <div class="control-item">
+                    <label>时间</label>
+                    <input type="number" id="spinDuration" value="3" min="1" max="10" step="0.5">
+                </div>
+            </div>
+
+            <div class="items-panel">
+                <div class="items-header">
+                    <input type="text" id="itemText" placeholder="输入选项内容">
+                    <input type="number" id="itemWeight" placeholder="比重" value="1" min="1" style="width: 60px;">
+                    <button onclick="addItem()">添加</button>
+                </div>
+                
+                <div class="items-list" id="itemList">
+                    <!-- 项列表在这里显示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="wheel.js"></script>
+</html> 
